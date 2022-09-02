@@ -1,0 +1,147 @@
+#配置动态数据源
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/local?serverTimezone=GMT%2B8&useUnicode=false&characterEncoding=utf8&useSSL=false
+    username: root
+    password: root
+    jdbc:
+      - driverClassName: dm.jdbc.driver.DmDriver
+        jdbcUrl: jdbc:dm://localhost:5236/TJJDCD
+        username: SYSDBA
+        password: SYSDBA
+        connName: local
+        type: DM
+        typeFlag: source
+      - driverClassName: com.mysql.cj.jdbc.Driver
+        jdbcUrl: jdbc:mysql://localhost:3306/test?serverTimezone=GMT%2B8&useUnicode=false&characterEncoding=utf8&useSSL=false
+        username: root
+        password: root
+        connName: local_copy
+        type: mysql
+        typeFlag: target
+        dialectConfig: dm_dialect
+    #开启断点续连
+    continueFlag: true
+#mybatis的设置，无需修改
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.myexp.mapper.*: debug
+
+#设置日志输出文件，可以查看到所有操作库的记录，如果需要开始自动断连重试功能必须设置路径方便查找
+db:
+  log:
+    config:
+      path: "D:/java/test"
+
+
+#配置动态数据源分发设置
+strategy:
+  config:
+    #设置执行器
+    execute:
+      #设置执行器类名 动态切换数据源查询表结构
+      "SwitchingDataSources":
+        #设置归属当前执行器的子执行器和执行方法及对应返回标识
+        childExecute:
+          "com.data.strategy.sources.execute.DBSource":
+            - methodName: "getDB" #执行的方法
+              returnFlag: "source" #返回的对应标识
+            #设置归属当前执行器的子执行器
+          "com.data.strategy.sources.execute.DBTarget":
+            - methodName: "getDB"
+              returnFlag: "target"
+            #设置执行器的执行逻辑
+        dispatcher:
+          - expression: config.getTypeFlag() == "source" #执行逻辑
+            flag: "source" #返回结果标识
+          - expression: config.getTypeFlag() == "target" #执行逻辑
+            flag: "source" #返回结果标识
+      #设置执行器类名 动态生成表结构SQL
+      "CreateTableStructure":
+        #设置归属当前执行器的子执行器和执行方法及对应返回标识
+        childExecute:
+          "com.data.strategy.structure.execute.DBSourceTable":
+            - methodName: "createTableStructure" #执行的方法
+              returnFlag: "source" #返回的对应标识
+            #设置归属当前执行器的子执行器
+          "com.data.strategy.structure.execute.DBTargetTable":
+            - methodName: "createTableStructure"
+              returnFlag: "target"
+        #设置执行器的执行逻辑
+        dispatcher:
+          - expression: config.getTypeFlag() == "source" #执行逻辑
+            flag: "source" #返回结果标识
+          - expression: config.getTypeFlag() == "target" #执行逻辑
+            flag: "target" #返回结果标识
+      #设置执行器类名 动态生成表结构字段SQL
+      "CreateColumn":
+        #设置归属当前执行器的子执行器和执行方法及对应返回标识
+        childExecute:
+          "com.data.strategy.structure.execute.DBSourceTable":
+            - methodName: "createColumn" #执行的方法
+              returnFlag: "source" #返回的对应标识
+            #设置归属当前执行器的子执行器
+          "com.data.strategy.structure.execute.DBTargetTable":
+            - methodName: "createColumn"
+              returnFlag: "target"
+        #设置执行器的执行逻辑
+        dispatcher:
+          - expression: config.getTypeFlag() == "source" #执行逻辑
+            flag: "source" #返回结果标识
+          - expression: config.getTypeFlag() == "target" #执行逻辑
+            flag: "target" #返回结果标识
+      #设置执行器类名 动态同步并创建表结构和表字段
+      "CreateTable":
+        #设置归属当前执行器的子执行器和执行方法及对应返回标识
+        childExecute:
+          "com.data.strategy.sources.execute.DBSource":
+            - methodName: "createTable" #执行的方法
+              returnFlag: "source" #返回的对应标识
+            #设置归属当前执行器的子执行器
+          "com.data.strategy.sources.execute.DBTarget":
+            - methodName: "createTable"
+              returnFlag: "target"
+        #设置执行器的执行逻辑
+        dispatcher:
+          - expression: config.getTypeFlag() == "source" #执行逻辑
+            flag: "source" #返回结果标识
+          - expression: config.getTypeFlag() == "target" #执行逻辑
+            flag: "source" #返回结果标识
+      #动态新增表字段
+      "InsertData":
+        #设置归属当前执行器的子执行器和执行方法及对应返回标识
+        childExecute:
+          "com.data.strategy.sources.execute.DBSource":
+            - methodName: "insertData" #执行的方法
+              returnFlag: "source" #返回的对应标识
+            #设置归属当前执行器的子执行器
+          "com.data.strategy.sources.execute.DBTarget":
+            - methodName: "insertData"
+              returnFlag: "target"
+        #设置执行器的执行逻辑
+        dispatcher:
+          - expression: config.getTypeFlag() == "source" #执行逻辑
+            flag: "source" #返回结果标识
+          - expression: config.getTypeFlag() == "target" #执行逻辑
+            flag: "source" #返回结果标识
+      "SelectData":
+        #设置归属当前执行器的子执行器和执行方法及对应返回标识
+        childExecute:
+          "com.data.strategy.sources.execute.DBSource":
+            - methodName: "selectData" #执行的方法
+              returnFlag: "source" #返回的对应标识
+            #设置归属当前执行器的子执行器
+          "com.data.strategy.sources.execute.DBTarget":
+            - methodName: "selectData"
+              returnFlag: "target"
+        #设置执行器的执行逻辑
+        dispatcher:
+          - expression: config.getTypeFlag() == "source" #执行逻辑
+            flag: "source" #返回结果标识
+          - expression: config.getTypeFlag() == "target" #执行逻辑
+            flag: "source" #返回结果标识
+

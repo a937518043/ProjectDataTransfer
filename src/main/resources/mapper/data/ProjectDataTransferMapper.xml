@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.data.dao.ProjectDataTransferMapper">
+    <sql id="mysql">
+        SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, COLUMN_TYPE, COLUMN_COMMENT
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = 'p2076_tydb'
+          AND TABLE_NAME = #{query.tableName}
+    </sql>
+
+    <sql id="getWareHouse">
+        SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, COLUMN_TYPE, COLUMN_COMMENT
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = #{query.tableName}
+    </sql>
+
+
+    <!--查询库所在的所有表结构 mysql-->
+    <select id="getDB" parameterType="com.data.entity.WareHouseMapper" resultType="com.data.entity.WareHouseEntity">
+        ${config.sql}
+    </select>
+
+    <!--查询目标数据源库表数据-->
+    <select id="getSourceData" parameterType="com.data.entity.WareHouseMapper" resultType="java.util.HashMap">
+        ${config.sql}
+    </select>
+
+    <!--执行sql-->
+    <insert id="executeCreateSql" parameterType="String">
+        ${config.sql}
+    </insert>
+
+    <!--执行sql-->
+    <insert id="executeSql" parameterType="String">
+        ${config.sql}
+    </insert>
+
+</mapper>

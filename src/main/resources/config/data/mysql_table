@@ -1,0 +1,60 @@
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for test
+-- ----------------------------
+
+
+#:table_#
+
+CREATE TABLE [tableName]  (
+  [columnList]
+) comment = '[comment]' ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+#:table_$
+
+#:column_#
+
+`[columnName]` [columnType][columnLength] [isNullable] COMMENT '[comment]'
+
+#:column_$
+
+#:column_varchar#
+
+`[columnName]` [columnType]([columnLength]) CHARACTER SET utf8 COLLATE utf8_general_ci [isNullable] DEFAULT NULL COMMENT '[comment]'
+
+#:column_varchar$
+
+#:column_text#
+
+`[columnName]` [columnType]([columnLength]) CHARACTER SET utf8 COLLATE utf8_general_ci [isNullable] DEFAULT NULL COMMENT '[comment]'
+
+#:column_text$
+
+
+
+#:alter_#
+
+ALTER TABLE [tableName] ADD COLUMN [columnName] [columnType] DEFAULT NULL COMMENT '[comment]';
+
+#:alter_$
+
+
+#:insert_#
+
+INSERT INTO [tableName] ([columnList]) VALUES [valueList];
+
+#:insert_$
+
+#:select_#
+
+SELECT [columnList] FROM [tableName]
+
+#:select_$
+
+#:schema_#
+
+select 'mysql' AS DBType, T.TABLE_SCHEMA, T.TABLE_NAME, T.COLUMN_NAME, T.DATA_TYPE, T.COLUMN_TYPE, T.COLUMN_COMMENT,T.IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS T WHERE T.table_schema = '[tableSchema]'
+
+#schema_$

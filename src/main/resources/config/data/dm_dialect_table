@@ -1,0 +1,10 @@
+{
+    "VARCHAR2":"VARCHAR",
+    "DATE":"DATE",
+    "NUMBER":"BIGINT",
+    "CLOB":"TEXT",
+    "TEXT":"TEXT",
+    "VARCHAR":"VARCHAR",
+    "TIMESTAMP":"DATETIME",
+    "DEC":"DECIMAL"
+}
